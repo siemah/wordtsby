@@ -1,30 +1,42 @@
-/**
- * Implement Gatsby's Node APIs in this file.
- *
- * See: https://www.gatsbyjs.org/docs/node-apis/
- */
+const path = require('path');
 
-// You can delete this file if you're not using it
 exports.createPages = ({ graphql, actions }) => {
-    const createWpPosts = new Promise((resolve, reject) => {
-      const query = graphql(`
-        {
-          allWordpressPost {
-            edges {
-              node {
-                id
-                slug
-              }
-            }
+  const { createPage } = actions;
+  const createWpPosts = new Promise((resolve, reject) => {
+  const query = graphql(`
+    {
+      allWordpressPost {
+        edges {
+          node {
+            id
+            slug
+            title
           }
         }
-      `)
-      query.then(result => {
-          console.log(JSON.stringify(result, null, 4))
-          resolve()
-      }) // query.then
-    }) // createWpPosts
+      }
+    }
+  `);
 
-    return Promise.all([createWpPosts])
-} 
-// createPages
+    query.then(result => {
+      if(result.errors) {
+        console.log(result.errors);
+        reject(result.errors)
+      }
+      const { edges } = result.data.allWordpressPost
+
+      edges.forEach(edge => {
+        let { slug, id } = edge.node;
+        createPage({
+          path: `/article/${slug}`,
+          component: path.resolve(`./src/templates/post.js`),
+          context: {
+            id: id,
+          }
+        })
+      });
+      resolve()
+    }) // query.then
+  }) // createWpPosts
+
+  return Promise.all([createWpPosts])
+} // createPages
