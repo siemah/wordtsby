@@ -13,6 +13,7 @@ const IndexPage = ({data}) => {
         data.allWordpressPost.edges.map(({ node }) => (
           <div key={node.id}>
             <Link to={`/article/${node.slug}`}>
+              <img src={node.featured_media.source_url} alt={node.featured_media.alt_text} />
               <h4><span dangerouslySetInnerHTML={{ __html: node.title }} /> - {node.date}</h4>
             </Link>
             <div dangerouslySetInnerHTML={{ __html: node.excerpt }} />
@@ -29,12 +30,17 @@ export const pageQuery = graphql`
       totalCount
       edges {
         node {
-        id 
-        title
-        slug
-        excerpt
-        date(formatString: "Do MMMM")
-      }
+          id 
+          title
+          slug
+          excerpt
+          date(formatString: "Do MMMM")
+          featured_media {
+            id
+            alt_text
+            source_url
+          }
+        }
       }
     }
   }
